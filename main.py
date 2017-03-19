@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import mpl_toolkits.mplot3d.axes3d as p3
 import matplotlib.animation as animation
 import sys
+import seaborn as sns
 
 class UAV(object):
   def __init__(self, J, e3):
@@ -24,7 +25,7 @@ class UAV(object):
     R = np.reshape(X[0:9],(3,3));  # rotation from body to inertial
     W = X[9:12];   # angular rate
     x = X[12:15];  # position
-    v = X[-3:];    # velocity
+    v = X[15:];    # velocity
     (f, M) = self.position_control(t, R, W, x, v);
     R_dot = np.dot(R,hat(W))
     W_dot = np.dot(la.inv(self.J), M - np.cross(W, np.dot(self.J, W)))
@@ -114,12 +115,12 @@ def attitude_errors( R, Rd, W, Wd ):
 def position_errors(x, xd, v, vd):
   ex = x - xd
   ev = v - vd
-  return (ex,ev)
+  return (ex, ev)
 
 def hat(x):
   hat_x = [0, -x[2], x[1],
-    x[2], 0, -x[0],
-    -x[1], x[0], 0]
+          x[2], 0, -x[0],
+          -x[1], x[0], 0]
   return np.reshape(hat_x,(3,3))
 
 
@@ -141,8 +142,7 @@ if __name__ == "__main__":
   v0 = [0.,0.,0.];   # initial velocity
   R0v = np.array(R0).flatten().T
   y0 = np.concatenate((R0v, W0,x0,v0))
-  sys.exit()
-  (sim) = odeint(uav_t.dydt,y0,t)
+  sim = odeint(uav_t.dydt,y0,t)
   # fig, ax = plt.subplots()
   fig = plt.figure()
   ax = p3.Axes3D(fig)
