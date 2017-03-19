@@ -71,19 +71,20 @@ class UAV(object):
     b3c_2dot = - A_2dot/norm_A + ( 2*np.dot(A*A_dot,A_dot) )/norm_A**3 + np.dot( A_dot* A_dot + A*A_2dot ,A)/norm_A**3 - 3*np.dot((A*A_dot)**2,A)/norm_A**5
 
     b_ = np.cross(b3c, b1d)
+    b_norm = la.norm(b_)
     b_dot = np.cross(b3c_dot, b1d) + np.cross(b3c, b1d_dot)
     b_2dot = np.cross(b3c_2dot, b1d) + 2*np.cross(b3c_dot, b1d_dot) + np.cross(b3c, b1d_ddot)
 
-    b1c = -np.cross( b3c, np.cross(b3c, b1d) )/la.norm( np.cross(b3c, b1d) )
-    b1c_dot = -( np.cross(b3c_dot, b_) + np.cross(b3c, b_dot) )/la.norm(b_) + np.cross(b3c, b_)*(b_dot* b_)/la.norm(b_)**3
+    b1c = -np.cross( b3c, b_ )/b_norm
+    b1c_dot = -( np.cross(b3c_dot, b_) + np.cross(b3c, b_dot) )/b_norm + np.cross(b3c, b_)*(b_dot* b_)/b_norm**3
 
     # intermediate steps to calculate b1c_2dot
-    m_1 = ( np.cross(b3c_2dot, b_) + 2*np.cross(b3c_dot, b_dot) + np.cross(b3c, b_2dot) )/la.norm(b_)
-    m_2 = ( np.cross(b3c_dot, b_) + np.cross(b3c, b_dot) )*np.dot(b_dot, b_)/la.norm(b_)**3
+    m_1 = ( np.cross(b3c_2dot, b_) + 2*np.cross(b3c_dot, b_dot) + np.cross(b3c, b_2dot) )/b_norm
+    m_2 = ( np.cross(b3c_dot, b_) + np.cross(b3c, b_dot) )*np.dot(b_dot, b_)/b_norm**3
     m_dot = m_1 - m_2
     n_1 = np.cross(b3c, b_)*np.dot(b_dot, b_)
     n_1dot = ( np.cross(b3c_dot, b_) + np.cross(b3c, b_dot) )*np.dot(b_dot, b_) + np.cross(b3c, b_)*( np.dot(b_2dot, b_)+np.dot(b_dot, b_dot) )
-    n_dot = n_1dot/la.norm(b_)**3 - 3*n_1*np.dot(b_dot, b_)/la.norm(b_)**5
+    n_dot = n_1dot/b_norm**3 - 3*n_1*np.dot(b_dot, b_)/b_norm**5
     b1c_2dot = -m_dot + n_dot
 
     Rc = np.reshape([b1c, np.cross(b3c, b1c), b3c],(3,3))
@@ -173,6 +174,3 @@ if __name__ == "__main__":
   # plt.plot(t,sim[:,-6:-3])
   plt.grid()
   plt.show()
-  # x = xd
-  # uav_t.position_control(xd,x)
-  # ode()
