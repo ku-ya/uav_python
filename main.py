@@ -91,7 +91,7 @@ class UAV(object):
 
     Rc = np.reshape([b1c, np.cross(b3c, b1c), b3c],(3,3)).T
     Rc_dot = np.reshape([b1c_dot, ( np.cross(b3c_dot, b1c) + np.cross(b3c, b1c_dot) ), b3c_dot],(3,3)).T
-    Rc_2dot = np.reshape( [b1c_2dot, ( np.cross(b3c_2dot, b1c) + np.cross(b3c_dot, b1c_dot) + np.cross(b3c_dot, b1c_dot) + np.cross(b3c, b1c_2dot) ), b3c_2dot],(3,3))
+    Rc_2dot = np.reshape( [b1c_2dot, ( np.cross(b3c_2dot, b1c) + np.cross(b3c_dot, b1c_dot) + np.cross(b3c_dot, b1c_dot) + np.cross(b3c, b1c_2dot) ), b3c_2dot],(3,3)).T
     Wc = vee(Rc.T.dot(Rc_dot))
     Wc_dot= vee( Rc_dot.T.dot(Rc_dot) + Rc.T.dot(Rc_2dot))
     # pdb.set_trace()
@@ -120,6 +120,12 @@ def position_errors(x, xd, v, vd):
   ex = x - xd
   ev = v - vd
   return (ex, ev)
+
+def rot_eul(x_in):
+  theta_x = np.arctan2(x_in[:,7], x_in[:,8])
+  theta_y = np.arctan2(x_in[:,6], (x_in[:,7]**2+x_in[:,8]**2)**(1/2))
+  theta_z = np.arctan2(x_in[:,1], x_in[:,0])
+  return np.array([theta_x,theta_y,theta_z]).T
 
 def hat(x):
   hat_x = [0, -x[2], x[1],
@@ -175,6 +181,12 @@ if __name__ == "__main__":
     # return line,
   ani = animation.FuncAnimation(fig, animate, np.arange(N),
                               interval=25, blit=False)
-  # plt.plot(t,sim[:,-6:-3])
+
+  plt.figure()
+  plt.subplot(211)
+  plt.plot(t,sim[:,-6:-3])
+  plt.grid()
+  plt.subplot(212)
+  plt.plot(t,rot_eul(sim))
   plt.grid()
   plt.show()
