@@ -11,7 +11,6 @@ import seaborn as sns
 
 class UAV(object):
   def __init__(self, J, e3):
-    # self.J
     self.m = 4.34
     self.g = 9.81
     self.J = J
@@ -21,6 +20,7 @@ class UAV(object):
     self.kx = 16.*self.m; # position gains
     self.kv = 5.6*self.m;# position gains
     print('initialized')
+    
   def dydt(self, X, t):
     R = np.reshape(X[0:9],(3,3));  # rotation from body to inertial
     W = X[9:12];   # angular rate
