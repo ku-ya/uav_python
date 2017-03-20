@@ -10,6 +10,7 @@ import sys
 import seaborn as sns
 
 class UAV(object):
+
   def __init__(self, J, e3):
     self.m = 4.34
     self.g = 9.81
@@ -20,7 +21,7 @@ class UAV(object):
     self.kx = 16.*self.m; # position gains
     self.kv = 5.6*self.m;# position gains
     print('initialized')
-    
+
   def dydt(self, X, t):
     R = np.reshape(X[0:9],(3,3));  # rotation from body to inertial
     W = X[9:12];   # angular rate
@@ -32,6 +33,7 @@ class UAV(object):
     x_dot = v
     v_dot = self.g*self.e3 - f*R.dot(self.e3)/self.m
     X_dot = np.concatenate((R_dot.flatten(), W_dot, x_dot, v_dot))
+    # pdb.set_trace()
     return X_dot
 
   def position_control(self, t, R, W, x, v):
@@ -87,11 +89,12 @@ class UAV(object):
     n_dot = n_1dot/b_norm**3 - 3*n_1*np.dot(b_dot, b_)/b_norm**5
     b1c_2dot = -m_dot + n_dot
 
-    Rc = np.reshape([b1c, np.cross(b3c, b1c), b3c],(3,3))
-    Rc_dot = np.reshape([b1c_dot, ( np.cross(b3c_dot, b1c) + np.cross(b3c, b1c_dot) ), b3c_dot],(3,3))
+    Rc = np.reshape([b1c, np.cross(b3c, b1c), b3c],(3,3)).T
+    Rc_dot = np.reshape([b1c_dot, ( np.cross(b3c_dot, b1c) + np.cross(b3c, b1c_dot) ), b3c_dot],(3,3)).T
     Rc_2dot = np.reshape( [b1c_2dot, ( np.cross(b3c_2dot, b1c) + np.cross(b3c_dot, b1c_dot) + np.cross(b3c_dot, b1c_dot) + np.cross(b3c, b1c_2dot) ), b3c_2dot],(3,3))
     Wc = vee(Rc.T.dot(Rc_dot))
     Wc_dot= vee( Rc_dot.T.dot(Rc_dot) + Rc.T.dot(Rc_2dot))
+    # pdb.set_trace()
     return (Rc, Wc, Wc_dot)
 
 def vee(M):
@@ -150,6 +153,7 @@ if __name__ == "__main__":
 
   # x = np.arange(0, 2*np.pi, 0.01)
   line, = ax.plot(sim[:,-6], sim[:,-5])
+
   def animate(i):
     line.set_data(np.vstack([sim[:i,-6], sim[:i,-5]]))  # update the data
     line.set_3d_properties(sim[:i,-4])
