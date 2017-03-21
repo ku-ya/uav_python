@@ -14,6 +14,7 @@ theta = np.linspace(0, 2*np.pi, N)
 phi, theta = np.meshgrid(phi, theta)
 
 # The Cartesian coordinates of the unit sphere
+
 x = np.sin(phi) * np.cos(theta)
 y = np.sin(phi) * np.sin(theta)
 z = np.cos(phi)
